@@ -20,7 +20,7 @@ import net.sf.jasperreports.view.JasperViewer;
 
 public class GeraRelatorios {
 
-    public void imprimirRelatorioSQLNoRelatorio(Map parametros, String diretorio) {
+    public boolean imprimirRelatorioSQLNoRelatorio(Map parametros, String diretorio, String titulo) {
         Connection conn = null;
         try {
             // Carrega conexão via JDBC
@@ -30,15 +30,32 @@ public class GeraRelatorios {
             // Preenche o relatório com os dados
             JasperPrint print = JasperFillManager.fillReport(diretorio, parametros, conn);
 
-            // Exibe visualização dos dados
-            JasperViewer.viewReport(print, false);
+            if (print == null) {
+                JOptionPane.showMessageDialog(null, "Falha ao criar o relatório", "Erro Relatorio", JOptionPane.ERROR_MESSAGE);
+                return false;
+            } else {
+                // verifica se tem alguma página  
+                if (print.getPages().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Não há conteúdo no relatório. A visualização foi cancelada", "Relatório vazio", JOptionPane.INFORMATION_MESSAGE);
+                    return false;
+                } else {
+                    // Exibe visualização dos dados
+                    JasperViewer jv = new JasperViewer(print, false);
+                    jv.setVisible(true);
+                    jv.setTitle(titulo);
+                    jv.setIconImage(null);
+                    return true;
+                }
+            }
 
-        } catch (ClassNotFoundException ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao localizar a classe responsável pela geração do relatório!\n" + ex.getMessage());
+            //exportar pra pdf
+            //            JasperExportManager.exportReportToPdfFile(print, "src/Relatorios/RelatorioEmPDF.pdf");
+        } catch (JRException e) {
+            return false;
         } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao executar consulta no Banco de dados!\n" + ex.getMessage());
-        } catch (JRException ex) {
-            JOptionPane.showMessageDialog(null, "Erro ao gerar relatório!\n" + ex.getMessage());
+            return false;
+        } catch (ClassNotFoundException ex) {
+            return false;
         } finally {
             try {
                 conn.close();
@@ -83,48 +100,14 @@ public class GeraRelatorios {
         }
     }
 
-    public boolean imprimirByListaByClientes(String caminhoDoRelatorio, Map parametros, List<Cliente> clientes) {
+    public boolean imprimirByLista(String caminhoDoRelatorio, Map parametros, List<String> etiquetas) {
         try {
             //compilação do JRXML
 //            JasperReport report = JasperCompileManager.compileReport(caminhoDoRelatorio);
 
             //preenchimento do relatório
             //JRBeanCollectionDataSource 
-            JasperPrint print = JasperFillManager.fillReport(caminhoDoRelatorio, parametros, new JRBeanCollectionDataSource(clientes));
-
-            if (print == null) {
-                JOptionPane.showMessageDialog(null, "Falha ao criar o relatório", "Erro Relatorio", JOptionPane.ERROR_MESSAGE);
-                return false;
-            } else {
-                // verifica se tem alguma página  
-                if (print.getPages().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Não há conteúdo no relatório. A visualização foi cancelada", "Relatório vazio", JOptionPane.INFORMATION_MESSAGE);
-                    return false;
-                } else {
-                    JasperViewer jv = new JasperViewer(print, false);
-                    jv.setVisible(true);
-                    jv.setTitle("Pedido Personalizado");
-                    jv.setIconImage(null);
-                    return true;
-                }
-            }
-
-            //exportar pra pdf
-            //            JasperExportManager.exportReportToPdfFile(print, "src/Relatorios/RelatorioEmPDF.pdf");
-        } catch (JRException e) {
-//            JOptionPane.showMessageDialog(null, "Erro ao gerar relatório!\n" + e.getMessage());
-            return false;
-        }
-    }
-    
-    public boolean imprimirByListaByProdutos(String caminhoDoRelatorio, Map parametros, List<Produto> produtos) {
-        try {
-            //compilação do JRXML
-//            JasperReport report = JasperCompileManager.compileReport(caminhoDoRelatorio);
-
-            //preenchimento do relatório
-            //JRBeanCollectionDataSource 
-            JasperPrint print = JasperFillManager.fillReport(caminhoDoRelatorio, parametros, new JRBeanCollectionDataSource(produtos));
+            JasperPrint print = JasperFillManager.fillReport(caminhoDoRelatorio, parametros, new JRBeanCollectionDataSource(etiquetas));
 
             if (print == null) {
                 JOptionPane.showMessageDialog(null, "Falha ao criar o relatório", "Erro Relatorio", JOptionPane.ERROR_MESSAGE);

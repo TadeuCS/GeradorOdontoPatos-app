@@ -51,11 +51,15 @@ public class Frm_Login extends javax.swing.JFrame {
             if (conexao.getConexao() != null) {
                 try {
                     st = conexao.getConexao();
-                    rs = st.executeQuery("select cnpj from filiais");
+                    rs = st.executeQuery("select * from filiais");
                     if (rs.next()) {
-                        prop.ler("cnpj");
-                        Frm_Principal f = new Frm_Principal();
-                        dispose();
+                        if (prop.ler("cnpj").replace(".", "").replace("/", "").replace("-", "").equals(rs.getString("cgc")) == true) {
+//                            Frm_Principal f = new Frm_Principal();
+                            Frm_EtiquetaCliente f= new Frm_EtiquetaCliente();
+                            dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Empresa não autorizada!");
+                        }
                     }
                 } catch (NoResultException e) {
                     JOptionPane.showMessageDialog(null, "Você não tem permissão para acessar o aplicativo!");
@@ -63,6 +67,8 @@ public class Frm_Login extends javax.swing.JFrame {
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, "Erro ao Consultar os dados da Empresa!\n" + ex);
                 }
+            } else {
+                JOptionPane.showMessageDialog(null, "sem conexao!");
             }
         } else {
             JOptionPane.showMessageDialog(null, "Usuário ou senha inválidos!");

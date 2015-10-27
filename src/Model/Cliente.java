@@ -15,10 +15,19 @@ public class Cliente {
     private String nome;
     private String endereco;
     private String numero;
+    private String bairro;
+    private String cep;
     private String cidade;
     private String estado;
-    private String cep;
 
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+    
     public String getCodigo() {
         return codigo;
     }
