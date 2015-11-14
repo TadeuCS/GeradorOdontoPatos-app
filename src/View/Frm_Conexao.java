@@ -348,13 +348,15 @@ public class Frm_Conexao extends javax.swing.JFrame {
 
     private void carregarCNPJ() {
         try {
+            con=new Conexao();
             st=con.getConexao();
             rs=st.executeQuery("select * from filiais");
             if(rs.next()){
-                txt_cnpj.setText(rs.getString("cnpj"));
+                txt_cnpj.setText(rs.getString("cgc"));
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, "Erro ao buscar o CNPJ!");
+            System.out.println(e);
         }
     }
 }
